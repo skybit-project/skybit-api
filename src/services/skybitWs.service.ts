@@ -74,7 +74,10 @@ export const attachSkybitWebSockets = (server: http.Server) => {
       return;
     }
 
-    if (pathname === "/api/v1/device/ws") {
+    const normalizedPath = pathname.replace(/\/+$/, "");
+
+    // Support both "/api/v1/device/ws" and "/device/ws" to be resilient to reverse-proxy path rewriting.
+    if (normalizedPath === "/api/v1/device/ws" || normalizedPath === "/device/ws") {
       const auth = extractDeviceToken(req.url, req.headers["sec-websocket-protocol"] as string | undefined);
       if (!auth.ok) {
         socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
@@ -88,7 +91,7 @@ export const attachSkybitWebSockets = (server: http.Server) => {
       return;
     }
 
-    if (pathname === "/api/v1/frontend/ws") {
+    if (normalizedPath === "/api/v1/frontend/ws" || normalizedPath === "/frontend/ws") {
       frontendWss.handleUpgrade(req, socket, head, (ws) => {
         frontendWss.emit("connection", ws, req);
       });
@@ -98,4 +101,3 @@ export const attachSkybitWebSockets = (server: http.Server) => {
     socket.destroy();
   });
 };
-

@@ -34,6 +34,7 @@ export enum HttpStatus {
   PAYLOAD_TOO_LARGE = 413,
   UNSUPPORTED_MEDIA_TYPE = 415,
   UNPROCESSABLE_ENTITY = 422,
+  UPGRADE_REQUIRED = 426,
   TOO_MANY_REQUESTS = 429,     // rate limiting
 
   /* =========================
