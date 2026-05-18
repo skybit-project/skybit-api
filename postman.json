@@ -157,20 +157,56 @@
           }
         },
         {
-          "name": "WebSocket Notes (device + frontend)",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/health",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "health"
-              ]
+          "name": "WebSocket",
+          "description": "Open WebSocket connections in Postman (WebSocket request). On connect, the API sends the latest {type:'state'} message immediately.",
+          "item": [
+            {
+              "name": "WS /device/ws (ESP8266)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{wsBaseUrl}}/api/v1/device/ws?token={{deviceToken}}",
+                  "host": [
+                    "{{wsBaseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "device",
+                    "ws"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": "{{deviceToken}}"
+                    }
+                  ]
+                },
+                "description": "Device channel. After connecting, send heartbeat messages periodically:\n\n{\"type\":\"heartbeat\",\"payload\":{\"uptimeMs\":123456,\"rssi\":-62}}\n\nServer will broadcast deviceStatus updates to frontend WS and update /api/v1/health lastHeartbeatAt."
+              }
             },
-            "description": "Device WS: {{wsBaseUrl}}/api/v1/device/ws?token={{deviceToken}} (send {\"type\":\"heartbeat\"} periodically).\nFrontend WS: {{wsBaseUrl}}/api/v1/frontend/ws (receives {type:'state', payload:{...}} + {type:'deviceStatus', payload:{...}}).\n\nPostman collection format does not reliably encode WS requests across versions; use Postman's WebSocket tab with these URLs."
-          }
+            {
+              "name": "WS /frontend/ws",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{wsBaseUrl}}/api/v1/frontend/ws",
+                  "host": [
+                    "{{wsBaseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "frontend",
+                    "ws"
+                  ]
+                },
+                "description": "Frontend channel. Receives:\n- {\"type\":\"state\",\"payload\":{...}}\n- {\"type\":\"deviceStatus\",\"payload\":{\"connected\":true,\"lastHeartbeatAt\":\"...\"}}"
+              }
+            }
+          ]
         }
       ]
     }
