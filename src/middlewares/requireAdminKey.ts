@@ -10,6 +10,10 @@ const extractBearer = (authorization: string | undefined): string | null => {
 };
 
 export const requireAdminKey = (req: Request, res: Response, next: NextFunction) => {
+  if (config.SKYBIT_PUBLIC_API) {
+    return next();
+  }
+
   const expected = config.SKYBIT_ADMIN_API_KEY;
   if (!expected) {
     // dev convenience; production is enforced in config

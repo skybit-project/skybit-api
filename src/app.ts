@@ -82,6 +82,15 @@ export const createApp = (): Application => {
         return callback(null, true);
       }
 
+      if (config.CORS_ALLOW_ALL) {
+        return callback(null, true);
+      }
+
+      // Allow local file-based demos (Origin may be "file://" or "null")
+      if (origin === "null" || origin.startsWith("file://")) {
+        return callback(null, true);
+      }
+
       let hostname: string;
       let host: string;
 

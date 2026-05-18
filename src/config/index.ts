@@ -9,6 +9,8 @@ const PORT = Number(process.env.PORT) || 3030;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const SKYBIT_ADMIN_API_KEY = process.env.SKYBIT_ADMIN_API_KEY;
 const SKYBIT_DEVICE_TOKEN = process.env.SKYBIT_DEVICE_TOKEN;
+const SKYBIT_PUBLIC_API = (process.env.SKYBIT_PUBLIC_API || "").toLowerCase() === "true";
+const CORS_ALLOW_ALL = (process.env.CORS_ALLOW_ALL || "").toLowerCase() === "true";
 
 if (!GEMINI_API_KEY) {
   console.warn("Warning: GEMINI_API_KEY is not set. Please set it in the .env file.");
@@ -20,8 +22,10 @@ const requireProdSecret = (name: string, value: string | undefined) => {
   }
 };
 
-requireProdSecret("SKYBIT_ADMIN_API_KEY", SKYBIT_ADMIN_API_KEY);
-requireProdSecret("SKYBIT_DEVICE_TOKEN", SKYBIT_DEVICE_TOKEN);
+if (!SKYBIT_PUBLIC_API) {
+  requireProdSecret("SKYBIT_ADMIN_API_KEY", SKYBIT_ADMIN_API_KEY);
+  requireProdSecret("SKYBIT_DEVICE_TOKEN", SKYBIT_DEVICE_TOKEN);
+}
 
 const parseEnvNumber = (value: string | undefined, fallback: number): number => {
   if (value === undefined) return fallback;
@@ -51,6 +55,8 @@ export const config = {
   GEMINI_API_KEY,
   SKYBIT_ADMIN_API_KEY,
   SKYBIT_DEVICE_TOKEN,
+  SKYBIT_PUBLIC_API,
+  CORS_ALLOW_ALL,
   SKYBIT_MAX_SCREEN_TEXT_LEN,
   SKYBIT_JSON_BODY_LIMIT,
 

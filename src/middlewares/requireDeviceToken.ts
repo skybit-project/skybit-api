@@ -1,6 +1,7 @@
 import { config } from "../config";
 
 export const extractDeviceToken = (reqUrl: string | undefined, protocolHeader: string | undefined) => {
+  if (config.SKYBIT_PUBLIC_API) return { ok: true as const };
   const expected = config.SKYBIT_DEVICE_TOKEN;
   if (!expected) return { ok: false as const, error: "SKYBIT_DEVICE_TOKEN not configured" };
 
@@ -27,4 +28,3 @@ export const extractDeviceToken = (reqUrl: string | undefined, protocolHeader: s
 
   return { ok: true as const };
 };
-
