@@ -8,6 +8,8 @@ import hpp from "hpp";
  * routes
  */
 import v1Routes from "./routes/v1";
+import { config } from "./config";
+import { jsonErrorHandler } from "./middlewares/jsonErrorHandler";
 
 
 
@@ -123,7 +125,7 @@ export const createApp = (): Application => {
   /**
    * parse request json
    */
-  app.use(express.json());
+  app.use(express.json({ limit: config.SKYBIT_JSON_BODY_LIMIT }));
 
   /**
    * protect against HTTP Parameter Pollution attacks
@@ -154,6 +156,11 @@ export const createApp = (): Application => {
    * ROUTE /api/v1
    */
   app.use("/api/v1", v1Routes);
+
+  /**
+   * reject invalid JSON payloads
+   */
+  app.use(jsonErrorHandler);
 
 
 

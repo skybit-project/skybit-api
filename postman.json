@@ -1,43 +1,40 @@
 {
   "info": {
     "_postman_id": "0c74aa40-d7b3-4e3b-9fb8-c1ec7ecfd6e4",
-    "name": "Civara API (v1)",
-    "description": "Generated from requirements/api-contract.tex. Base URL defaults to production; override {{baseUrl}} for local development.",
+    "name": "SkyBit API (v1)",
+    "description": "SkyBit: Real-Time IoT Display and RGB Control System. Base URL defaults to production; override {{baseUrl}} for local development.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
-      "value": "https://civara.mahros.dev/api/v1",
+      "value": "https://skybit-api.mahros.dev/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "adminApiKey",
+      "value": "REPLACE_ME",
+      "type": "string"
+    },
+    {
+      "key": "deviceToken",
+      "value": "REPLACE_ME",
+      "type": "string"
+    },
+    {
+      "key": "wsBaseUrl",
+      "value": "wss://skybit-api.mahros.dev",
       "type": "string"
     }
   ],
   "item": [
     {
-      "name": "Health Check",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/health",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "health"
-          ]
-        },
-        "description": "GET /health — Checks whether the API is running."
-      },
-      "response": [
+      "name": "SkyBit (v1)",
+      "description": "REST endpoints for SkyBit state control. Auth: set {{adminApiKey}} and use x-api-key header for PATCH.",
+      "item": [
         {
-          "name": "200 OK",
-          "originalRequest": {
+          "name": "GET /health",
+          "request": {
             "method": "GET",
             "header": [
               {
@@ -53,18 +50,127 @@
               "path": [
                 "health"
               ]
-            }
-          },
-          "status": "OK",
-          "code": 200,
-          "_postman_previewlanguage": "json",
-          "header": [
-            {
-              "key": "Content-Type",
-              "value": "application/json"
-            }
-          ],
-          "body": "{\n  \"success\": true,\n  \"message\": \"Request completed successfully\",\n  \"data\": {\n    \"status\": \"ok\",\n    \"service\": \"Civara API\"\n  },\n  \"meta\": null\n}"
+            },
+            "description": "Checks API availability and returns connected client counts + device heartbeat timestamp."
+          }
+        },
+        {
+          "name": "GET /state",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/state",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "state"
+              ]
+            },
+            "description": "Returns the current LED + screen state."
+          }
+        },
+        {
+          "name": "PATCH /state (update LED + Screen)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-api-key",
+                "value": "{{adminApiKey}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"led\": { \"r\": 255, \"g\": 0, \"b\": 0, \"mode\": \"solid\" },\n  \"screen\": { \"text\": \"mahros\", \"mode\": \"scroll\", \"speedMs\": 30, \"size\": 2 }\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/state",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "state"
+              ]
+            },
+            "description": "Updates the current state and broadcasts it to /api/v1/device/ws and /api/v1/frontend/ws."
+          }
+        },
+        {
+          "name": "PATCH /state (LED only)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-api-key",
+                "value": "{{adminApiKey}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"led\": { \"r\": 10, \"g\": 20, \"b\": 30 }\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/state",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "state"
+              ]
+            },
+            "description": "Partial update example."
+          }
+        },
+        {
+          "name": "WebSocket Notes (device + frontend)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Device WS: {{wsBaseUrl}}/api/v1/device/ws?token={{deviceToken}} (send {\"type\":\"heartbeat\"} periodically).\nFrontend WS: {{wsBaseUrl}}/api/v1/frontend/ws (receives {type:'state', payload:{...}} + {type:'deviceStatus', payload:{...}}).\n\nPostman collection format does not reliably encode WS requests across versions; use Postman's WebSocket tab with these URLs."
+          }
         }
       ]
     }

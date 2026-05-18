@@ -1,6 +1,7 @@
 import http from 'http';
 import { config } from './config';
 import { createApp } from "./app";
+import { attachSkybitWebSockets } from "./services/skybitWs.service";
 
 
 process.on('uncaughtException', (err) => {
@@ -43,6 +44,7 @@ const startServer = async () => {
          */
         const app = createApp();
         const server = http.createServer(app);
+        attachSkybitWebSockets(server);
 
 
         /**
